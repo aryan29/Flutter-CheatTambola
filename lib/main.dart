@@ -52,7 +52,16 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  String numbers() {}
+  void init() {
+    for (int i = 1; i <= 100; i++) {
+      mp[i] = 0;
+      setState(() {
+        mp[i] = 0;
+        cur = "";
+      });
+    }
+  }
+
   Color getcolor(int x) {
     if (mp[x] == 1)
       return Colors.red;
@@ -73,11 +82,13 @@ class _MyHomePageState extends State<MyHomePage> {
             SizedBox(
                 height: 50.0,
                 width: double.infinity,
-                child: Text(cur,
+                child: Text(
+                  cur,
                   style: TextStyle(
                     fontSize: 50.0,
                     fontFamily: "Horizon",
-                  ),textAlign: TextAlign.center,
+                  ),
+                  textAlign: TextAlign.center,
                 )),
             Padding(padding: EdgeInsets.only(bottom: 30.0)),
             RichText(
@@ -118,6 +129,18 @@ class _MyHomePageState extends State<MyHomePage> {
               'Press It',
               style: Theme.of(context).textTheme.display1,
             ),
+            SizedBox(height: 20),
+            Container(
+              height:50.0,
+              width:200.0,
+              child:FittedBox(
+              child:FlatButton(
+              autofocus: true,
+              onPressed: init,
+              child: Text("Start New Game"),
+            ),
+              )
+            )
           ],
         ),
       ),
