@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'dart:math';
 
@@ -24,63 +26,101 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  String cur = "46";
+  HashMap mp = new HashMap<int, int>();
+  _MyHomePageState() {
+    for (int i = 1; i <= 100; i++) {
+      mp[i] = 0;
+    }
+  }
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+  void random_number() {
+    var rng = new Random();
+    int x = 1 + rng.nextInt(100);
+    print(x);
+    print(mp[x]);
+    if (mp[x] == 0) {
+      rng.nextInt(100);
+      mp[x] = 1;
+      setState(() {
+        mp[x] = 1;
+        cur = "$x ";
+      });
+    } else {
+      print("Repeated");
+      random_number();
+    }
+  }
+
+  String numbers() {}
+  Color getcolor(int x) {
+    if (mp[x] == 1)
+      return Colors.red;
+    else
+      return Colors.blue;
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
+            SizedBox(
+                height: 50.0,
+                width: double.infinity,
+                child: Text(cur,
+                  style: TextStyle(
+                    fontSize: 50.0,
+                    fontFamily: "Horizon",
+                  ),textAlign: TextAlign.center,
+                )),
+            Padding(padding: EdgeInsets.only(bottom: 30.0)),
+            RichText(
+              text: TextSpan(
+                style: TextStyle(
+                    color: Colors.blue,
+                    letterSpacing: 1.0,
+                    wordSpacing: 6.0,
+                    fontSize: 20.0),
+                children: <TextSpan>[
+                  for (int i = 0; i <= 9; i++)
+                    for (int j = 1; j <= 10; j++)
+                      () {
+                        if ((i * 10 + j) <= 9)
+                          return TextSpan(
+                              text: "${i * 10 + j}  ",
+                              style: TextStyle(color: getcolor(i * 10 + j)));
+                        if ((i * 10 + j) % 10 != 0)
+                          return TextSpan(
+                              text: "${i * 10 + j} ",
+                              style: TextStyle(color: getcolor(i * 10 + j)));
+                        else
+                          return TextSpan(
+                              text: "${i * 10 + j}\n",
+                              style: TextStyle(color: getcolor(i * 10 + j)));
+                      }()
+                ],
+              ),
             ),
+            FloatingActionButton(
+              autofocus: true,
+              onPressed: random_number,
+              tooltip: 'Increment',
+              child: Icon(Icons.navigate_next),
+            ),
+            SizedBox(height: 20),
             Text(
-              '$_counter',
+              'Press It',
               style: Theme.of(context).textTheme.display1,
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
