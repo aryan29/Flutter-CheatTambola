@@ -1,7 +1,9 @@
 import 'dart:collection';
-
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'src/empty_page.dart';
 import 'dart:math';
+import 'package:passcode_screen/passcode_screen.dart';
 
 void main() => runApp(MyApp());
 
@@ -23,17 +25,68 @@ class MyHomePage extends StatefulWidget {
   final String title;
   @override
   _MyHomePageState createState() => _MyHomePageState();
+  void printing(String x) {
+    print("Getting data $x");
+    _MyHomePageState().getdata(x);
+  }
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  var cheatData = new List();
+  final StreamController<bool> _verificationNotifier =
+      StreamController<bool>.broadcast();
   String cur = "46";
   HashMap mp = new HashMap<int, int>();
   _MyHomePageState() {
+    cheatData.clear();
+    // print(cheatData);
     for (int i = 1; i <= 100; i++) {
       mp[i] = 0;
     }
   }
+  Future<void> getdata(String x) async {
+    print("Coming to get Data\n");
+    String s = "";
+    for (int i = 0; i < x.length; i++) {
+      if (x[i] != ',') {
+        s += x[i];
+      } else {
+        print(s);
+        cheatData.add(int.parse(s));
+        s = "";
+      }
+    }
+    print(cheatData);
+  }
 
+  _showLockScreen(BuildContext context, {bool opaque}) {
+    Navigator.push(
+        context,
+        PageRouteBuilder(
+          opaque: opaque,
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              PasscodeScreen(
+            title: 'Enter App Passcode',
+            passwordEnteredCallback: _onPasscodeEntered,
+            cancelLocalizedText: 'Cancel',
+            deleteLocalizedText: 'Delete',
+            shouldTriggerVerification: _verificationNotifier.stream,
+            backgroundColor: Colors.black.withOpacity(0.8),
+            cancelCallback: _onPasscodeCancelled,
+          ),
+        ));
+  }
+
+  Future<void> _onPasscodeEntered(String enteredPasscode) {
+    bool isValid = '123456' == enteredPasscode;
+    if (isValid) {
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return EmptyPage();
+      }));
+    }
+  }
+
+  _onPasscodeCancelled() {}
   void random_number() {
     var rng = new Random();
     int x = 1 + rng.nextInt(100);
@@ -53,6 +106,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void init() {
+    cheatData.clear();
+    //print(cheatData);
     for (int i = 1; i <= 100; i++) {
       mp[i] = 0;
       setState(() {
@@ -119,6 +174,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             FloatingActionButton(
+              heroTag: "btn1",
               autofocus: true,
               onPressed: random_number,
               tooltip: 'Increment',
@@ -129,18 +185,24 @@ class _MyHomePageState extends State<MyHomePage> {
               'Press It',
               style: Theme.of(context).textTheme.display1,
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 40),
             Container(
-              height:50.0,
-              width:200.0,
-              child:FittedBox(
-              child:FlatButton(
+                height: 50.0,
+                width: 200.0,
+                child: FittedBox(
+                  child: FlatButton(
+                    autofocus: true,
+                    onPressed: init,
+                    child: Text("Start New Game"),
+                  ),
+                )),
+            FloatingActionButton(
+              heroTag: "btn2",
               autofocus: true,
-              onPressed: init,
-              child: Text("Start New Game"),
+              onPressed: () => _showLockScreen(context, opaque: false),
+              tooltip: 'ChangeScreen',
+              child: Icon(Icons.weekend),
             ),
-              )
-            )
           ],
         ),
       ),
