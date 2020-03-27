@@ -51,7 +51,6 @@ class _MyHomePageState extends State<MyHomePage> {
       if (x[i] != ',') {
         s += x[i];
       } else {
-        print(s);
         cheatData.add(int.parse(s));
         s = "";
       }
