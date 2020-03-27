@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'src/empty_page.dart';
 import 'dart:math';
 import 'package:passcode_screen/passcode_screen.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
+enum TtsState { playing, stopped }
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -21,41 +23,37 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
   final String title;
+  List cheatData;
+  MyHomePage({Key key, this.title, this.cheatData}) : super(key: key);
   @override
-  _MyHomePageState createState() => _MyHomePageState();
-  void printing(String x) {
-    print("Getting data $x");
-    _MyHomePageState().getdata(x);
-  }
+  _MyHomePageState createState() => _MyHomePageState(cheatData: cheatData);
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  var cheatData = new List();
+  FlutterTts flutterTts = new FlutterTts();
+
+  TtsState ttsState = TtsState.stopped;
+  List cheatData;
+  _MyHomePageState({this.cheatData});
   final StreamController<bool> _verificationNotifier =
       StreamController<bool>.broadcast();
-  String cur = "46";
+  String cur = "";
   HashMap mp = new HashMap<int, int>();
-  _MyHomePageState() {
-    cheatData.clear();
-    // print(cheatData);
-    for (int i = 1; i <= 100; i++) {
-      mp[i] = 0;
-    }
+  Future _speak(int z) async {
+    await flutterTts.setLanguage("en-IN");
+    await flutterTts.setSpeechRate(0.4);
+    var result;
+    if (z < 9)
+      result = await flutterTts.speak("Only Number  $z");
+    else
+      result = await flutterTts.speak("$z");
+    if (result == 1) setState(() => ttsState = TtsState.playing);
   }
-  Future<void> getdata(String x) async {
-    print("Coming to get Data\n");
-    String s = "";
-    for (int i = 0; i < x.length; i++) {
-      if (x[i] != ',') {
-        s += x[i];
-      } else {
-        cheatData.add(int.parse(s));
-        s = "";
-      }
-    }
-    print(cheatData);
+
+  Future _stop() async {
+    var result = await flutterTts.stop();
+    if (result == 1) setState(() => ttsState = TtsState.stopped);
   }
 
   _showLockScreen(BuildContext context, {bool opaque}) {
@@ -88,10 +86,21 @@ class _MyHomePageState extends State<MyHomePage> {
   _onPasscodeCancelled() {}
   void random_number() {
     var rng = new Random();
-    int x = 1 + rng.nextInt(100);
+    int x;
+    try {
+      if (cheatData.length != 0) {
+        x = cheatData[rng.nextInt(cheatData.length)];
+        cheatData.remove(x);
+      } else {
+        x = 1 + rng.nextInt(100);
+      }
+    } catch (e) {
+      x = 1 + rng.nextInt(100);
+    }
     print(x);
     print(mp[x]);
     if (mp[x] == 0) {
+      _speak(x);
       rng.nextInt(100);
       mp[x] = 1;
       setState(() {
@@ -105,8 +114,24 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void init() {
+    print(cheatData);
+    print("Coming to init");
     cheatData.clear();
     //print(cheatData);
+    for (int i = 1; i <= 100; i++) {
+      mp[i] = 0;
+      setState(() {
+        mp[i] = 0;
+        cur = "";
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    print("Coming to init state");
+    super.initState();
+    // cheatData.clear();
     for (int i = 1; i <= 100; i++) {
       mp[i] = 0;
       setState(() {

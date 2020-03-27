@@ -2,6 +2,23 @@ import 'package:flutter/material.dart';
 import '../main.dart';
 
 class EmptyPage extends StatelessWidget {
+  List<int> li = [1,3];//Generate Some Random List to Get Some Extra Values
+  void setli() {
+    print("Coming to Converter");
+    String z = "";
+    String s = mycontroller.text;
+    for (int i = 0; i < s.length; i++) {
+      if (s[i] != ',') {
+        z += s[i];
+      } else {
+        li.add(int.parse(z));
+        z = "";
+      }
+    }
+    if (z != "") li.add(int.parse(z));
+    print(li);
+  }
+
   TextEditingController mycontroller = new TextEditingController();
   @override
   Widget build(BuildContext context) {
@@ -29,9 +46,11 @@ class EmptyPage extends StatelessWidget {
           ),
           FlatButton(
               color: Colors.blue,
-              onPressed: () {
-                final sec = MyHomePage();
-                sec.printing(mycontroller.text);
+              onPressed: () async {
+                await setli();
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) =>
+                        MyHomePage(title: "Tambola", cheatData: li)));
               },
               child: Text("Save")),
           SizedBox(
