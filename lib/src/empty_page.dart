@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 import '../main.dart';
 
 class EmptyPage extends StatelessWidget {
-  List<int> li = [1,3];//Generate Some Random List to Get Some Extra Values
+  List<int> li = []; //Generate Some Random List to Get Some Extra Values
   void setli() {
     print("Coming to Converter");
     String z = "";
@@ -17,6 +18,13 @@ class EmptyPage extends StatelessWidget {
     }
     if (z != "") li.add(int.parse(z));
     print(li);
+    int sz = li.length;
+    var rng = new Random();
+    for (int i = 1; i <= sz * 4; i++) {
+      int jj = rng.nextInt(100);
+      li.add(jj);
+    }
+    li = li.toSet().toList();
   }
 
   TextEditingController mycontroller = new TextEditingController();
