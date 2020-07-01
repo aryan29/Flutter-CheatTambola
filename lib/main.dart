@@ -187,26 +187,27 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Text("Next",
               style: TextStyle(color: Colors.white, fontSize: 30)));
     } else {
-      paused = true;
+      // paused = true;
 
       return FlatButton(
           autofocus: true,
           onPressed: () {
             if (paused == true) {
+              paused = false;
               timer = Timer.periodic(Duration(seconds: 5), (timer) {
                 paused = false;
                 if (paused == false)
                   random_number();
-                // else {
-                //   print("here");
-                // }
               });
             } else {
               timer.cancel();
-              paused = true;
+              setState(() {
+ paused = true;
+              });
+
             }
           },
-          child: (paused)
+          child: (paused==false)
               ? Icon(Icons.pause, color: Colors.white, size: 50)
               : Icon(Icons.play_arrow, color: Colors.white, size: 50));
     }
