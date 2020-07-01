@@ -89,7 +89,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _onPasscodeEntered(String enteredPasscode) {
-    bool isValid = '123456' == enteredPasscode;
+    bool isValid;
+    if (!pref.containsKey("password"))
+      isValid = '123456' == enteredPasscode;
+    else
+      isValid = pref.getString("password") == enteredPasscode;
     if (isValid) {
       Navigator.push(context, MaterialPageRoute(builder: (context) {
         return EmptyPage();

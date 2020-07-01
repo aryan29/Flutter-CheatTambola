@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 import '../main.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 
 class EmptyPage extends StatelessWidget {
   List<int> li = []; //Generate Some Random List to Get Some Extra Values
@@ -30,56 +30,83 @@ class EmptyPage extends StatelessWidget {
   }
 
   TextEditingController mycontroller = new TextEditingController();
-
+  TextEditingController mycontroller1 = new TextEditingController();
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      body: Center(
-          child: Column(
-        children: <Widget>[
-          SizedBox(
-            height: 200,
-          ),
-          Container(
-            width: 300,
-            child: TextField(
-                controller: mycontroller,
-                style: TextStyle(letterSpacing: 4.0),
-                keyboardType: TextInputType.multiline,
-                maxLines: null,
-                decoration: InputDecoration(
-                  icon: Icon(Icons.confirmation_number),
-                  hintText: "Ex:- 1,2,3",
-                )),
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          FlatButton(
-              color: Colors.blue,
-              onPressed: () async {
-                await setli();
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) =>
-                        MyHomePage(title: "Tambola", cheatData: li)));
-              },
-              child: Text("Save")),
-          SizedBox(
-            height: 20,
-          ),
-          FlatButton(
-              color: Colors.blue, onPressed: () {}, child: Text("Clear")),
-          SizedBox(
-            height: 20,
-          ),
-          FlatButton(
-              onPressed: () {
-                int count = 0;
-                Navigator.of(context).popUntil((_) => count++ >= 2);
-              },
-              child: Text("Go Back")),
-        ],
-      )),
+      body: SingleChildScrollView(
+              child: Center(
+            child: Column(
+          children: <Widget>[
+            SizedBox(
+              height: 200,
+            ),
+            Container(
+              width: 300,
+              child: TextField(
+                  controller: mycontroller,
+                  style: TextStyle(letterSpacing: 4.0),
+                  keyboardType: TextInputType.multiline,
+                  maxLines: null,
+                  decoration: InputDecoration(
+                    icon: Icon(Icons.confirmation_number),
+                    hintText: "Ex:- 1,2,3",
+                  )),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            FlatButton(
+                color: Colors.blue,
+                onPressed: () async {
+                  await setli();
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) =>
+                          MyHomePage(title: "Tambola", cheatData: li)));
+                },
+                child: Text("Save")),
+            SizedBox(
+              height: 20,
+            ),
+            FlatButton(
+                color: Colors.blue, onPressed: () {}, child: Text("Clear")),
+            SizedBox(
+              height: 20,
+            ),
+            FlatButton(
+                onPressed: () {
+                  int count = 0;
+                  Navigator.of(context).popUntil((_) => count++ >= 2);
+                },
+                child: Text("Go Back")),
+            SizedBox(
+              height: 100,
+            ),
+            Container(
+              width: 300,
+              child: TextField(
+                  controller: mycontroller1,
+                  style: TextStyle(letterSpacing: 4.0),
+                  keyboardType: TextInputType.number,
+                  maxLines: null,
+                  decoration: InputDecoration(
+                    icon: Icon(Icons.confirmation_number),
+                    hintText: "Ex:- Enter 6 Digit Numerical Password",
+                  )),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            FlatButton(
+                color: Colors.blue,
+                onPressed: () async {
+                  if(mycontroller1.text.length==6)
+                  pref.setString("password", mycontroller1.text);
+                },
+                child: Text("Save")),
+          ],
+        )),
+      ),
     );
   }
 }
