@@ -1,13 +1,23 @@
 import 'dart:collection';
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:tambola/settingPage.dart';
 import 'src/empty_page.dart';
 import 'dart:math';
 import 'package:passcode_screen/passcode_screen.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import 'provider1.dart';
 
 enum TtsState { playing, stopped }
-void main() => runApp(MyApp());
+SharedPreferences pref;
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  pref = await SharedPreferences.getInstance();
+  runApp(ChangeNotifierProvider(
+      create: (_) => Modes(), child: MaterialApp(home: new MyApp())));
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -32,6 +42,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   FlutterTts flutterTts = new FlutterTts();
+  String mode;
+  bool paused = true;
 
   TtsState ttsState = TtsState.stopped;
   List cheatData;
@@ -89,16 +101,17 @@ class _MyHomePageState extends State<MyHomePage> {
     int x;
     try {
       if (cheatData.length != 0) {
+        // print("here");
         x = cheatData[rng.nextInt(cheatData.length)];
         cheatData.remove(x);
       } else {
+        // print("o here");
         x = 1 + rng.nextInt(100);
       }
     } catch (e) {
       x = 1 + rng.nextInt(100);
     }
     print(x);
-    print(mp[x]);
     if (mp[x] == 0) {
       _speak(x);
       rng.nextInt(100);
@@ -108,15 +121,16 @@ class _MyHomePageState extends State<MyHomePage> {
         cur = "$x ";
       });
     } else {
-      print("Repeated");
+      // print("Repeated");
       random_number();
     }
   }
 
   void init() {
+    paused = true;
     print(cheatData);
     print("Coming to init");
-    cheatData.clear();
+    cheatData = [];
     //print(cheatData);
     for (int i = 1; i <= 100; i++) {
       mp[i] = 0;
@@ -129,8 +143,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
+    mode = pref.getString("mode");
     print("Coming to init state");
+    paused = true;
     super.initState();
+    // cheatData = [];
     // cheatData.clear();
     for (int i = 1; i <= 100; i++) {
       mp[i] = 0;
@@ -145,89 +162,171 @@ class _MyHomePageState extends State<MyHomePage> {
     if (mp[x] == 1)
       return Colors.red;
     else
-      return Colors.blue;
+      return Colors.white;
+  }
+
+  getlast(int i) {
+    // print(mp[i]);
+    if (mp[i] == 1) {
+      return Container(
+          padding: EdgeInsets.all(5),
+          child: Center(
+            child: Text(i.toString(),
+                style: TextStyle(color: Colors.white, fontSize: 40)),
+          ));
+    } else
+      return Container();
+  }
+ Timer timer;
+  getModeButton(String mode) {
+    print(paused);
+    if (mode == "manual") {
+      return FlatButton(
+          autofocus: true,
+          onPressed: random_number,
+          child: Text("Next",
+              style: TextStyle(color: Colors.white, fontSize: 30)));
+    } else {
+      paused = true;
+
+      return FlatButton(
+          autofocus: true,
+          onPressed: () {
+            if (paused == true) {
+              timer = Timer.periodic(Duration(seconds: 5), (timer) {
+                paused = false;
+                if (paused == false)
+                  random_number();
+                // else {
+                //   print("here");
+                // }
+              });
+            } else {
+              timer.cancel();
+              paused = true;
+            }
+          },
+          child: (paused)
+              ? Icon(Icons.pause, color: Colors.white, size: 50)
+              : Icon(Icons.play_arrow, color: Colors.white, size: 50));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
+      // floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
+      floatingActionButton: Align(
+        alignment: Alignment(0.9, 0.2),
+        child: GestureDetector(
+          onLongPress: () {
+            return _showLockScreen(context, opaque: false);
+          },
+          onTap: () {
+            Navigator.of(context)
+                .push(MaterialPageRoute(builder: (context) => Settings()));
+          },
+          child: Icon(Icons.settings, size: 40, color: Colors.white),
+        ),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            SizedBox(
-                height: 50.0,
-                width: double.infinity,
-                child: Text(
-                  cur,
-                  style: TextStyle(
-                    fontSize: 50.0,
-                    fontFamily: "Horizon",
-                  ),
-                  textAlign: TextAlign.center,
-                )),
-            Padding(padding: EdgeInsets.only(bottom: 30.0)),
-            RichText(
-              text: TextSpan(
-                style: TextStyle(
-                    color: Colors.blue,
-                    letterSpacing: 1.0,
-                    wordSpacing: 6.0,
-                    fontSize: 20.0),
-                children: <TextSpan>[
-                  for (int i = 0; i <= 9; i++)
-                    for (int j = 1; j <= 10; j++)
-                      () {
-                        if ((i * 10 + j) <= 9)
-                          return TextSpan(
-                              text: "${i * 10 + j}  ",
-                              style: TextStyle(color: getcolor(i * 10 + j)));
-                        if ((i * 10 + j) % 10 != 0)
-                          return TextSpan(
-                              text: "${i * 10 + j} ",
-                              style: TextStyle(color: getcolor(i * 10 + j)));
-                        else
-                          return TextSpan(
-                              text: "${i * 10 + j}\n",
-                              style: TextStyle(color: getcolor(i * 10 + j)));
-                      }()
-                ],
+      floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
+      body: Container(
+        color: Colors.grey[900],
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              SizedBox(
+                  height: 50.0,
+                  width: double.infinity,
+                  child: Text(
+                    cur,
+                    style: TextStyle(
+                      fontSize: 50.0,
+                      fontFamily: "Horizon",
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                    textAlign: TextAlign.center,
+                  )),
+              Padding(padding: EdgeInsets.only(bottom: 30.0)),
+              Container(
+                  height: height * 0.4,
+                  width: width * 0.9,
+                  child: Center(
+                    child: GridView.count(
+                      physics: NeverScrollableScrollPhysics(),
+                      crossAxisCount: 10,
+                      childAspectRatio: width * 0.9 / (height * 0.4),
+                      children: <Widget>[
+                        for (int i = 1; i <= 90; i++)
+                          Center(
+                            child: Container(
+                                child: Text(i.toString(),
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: getcolor(i)))),
+                          )
+                      ],
+                    ),
+                  )),
+              SizedBox(height: 20),
+              Consumer<Modes>(
+                builder: (context, myModel, child) {
+                  print("Hey I am getting Notified");
+                  return getModeButton(myModel.mode);
+                },
               ),
-            ),
-            FloatingActionButton(
-              heroTag: "btn1",
-              autofocus: true,
-              onPressed: random_number,
-              tooltip: 'Increment',
-              child: Icon(Icons.navigate_next),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Press It',
-              style: Theme.of(context).textTheme.display1,
-            ),
-            SizedBox(height: 40),
-            Container(
-                height: 50.0,
-                width: 200.0,
-                child: FittedBox(
-                  child: FlatButton(
-                    autofocus: true,
-                    onPressed: init,
-                    child: Text("Start New Game"),
-                  ),
-                )),
-            FloatingActionButton(
-              heroTag: "btn2",
-              autofocus: true,
-              onPressed: () => _showLockScreen(context, opaque: false),
-              tooltip: 'ChangeScreen',
-              child: Icon(Icons.weekend),
-            ),
-          ],
+              SizedBox(height: 40),
+              Align(
+                alignment: FractionalOffset.bottomLeft,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: <Widget>[
+                    FlatButton(
+                        autofocus: true,
+                        onPressed: init,
+                        child: Text("New Game",
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 20))),
+                    FlatButton(
+                        autofocus: true,
+                        onPressed: () => showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                backgroundColor:
+                                    Colors.transparent.withOpacity(0.6),
+                                actions: <Widget>[
+                                  FlatButton(
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(),
+                                      child: Icon(
+                                        Icons.cancel,
+                                        color: Colors.white,
+                                        size: 30,
+                                      ))
+                                ],
+                                content: Container(
+                                    height: height,
+                                    width: width,
+                                    child: ListView.builder(
+                                        itemCount: 90,
+                                        itemBuilder: (context, i) {
+                                          return getlast(i + 1);
+                                        })),
+                              );
+                            }),
+                        child: Text("Last numbers",
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 20))),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

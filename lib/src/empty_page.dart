@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 import '../main.dart';
 
+
 class EmptyPage extends StatelessWidget {
   List<int> li = []; //Generate Some Random List to Get Some Extra Values
   void setli() {
@@ -20,14 +21,16 @@ class EmptyPage extends StatelessWidget {
     print(li);
     int sz = li.length;
     var rng = new Random();
-    for (int i = 1; i <= sz * 4; i++) {
-      int jj = rng.nextInt(100);
+    for (int i = 1; i <= sz * 3; i++) {
+      int jj = rng.nextInt(90);
       li.add(jj);
     }
     li = li.toSet().toList();
+    print(li);
   }
 
   TextEditingController mycontroller = new TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -71,7 +74,8 @@ class EmptyPage extends StatelessWidget {
           ),
           FlatButton(
               onPressed: () {
-                Navigator.pop(context);
+                int count = 0;
+                Navigator.of(context).popUntil((_) => count++ >= 2);
               },
               child: Text("Go Back")),
         ],
