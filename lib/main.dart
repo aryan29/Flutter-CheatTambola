@@ -11,6 +11,7 @@ import 'package:provider/provider.dart';
 import 'provider1.dart';
 
 enum TtsState { playing, stopped }
+
 SharedPreferences pref;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,6 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
   FlutterTts flutterTts = new FlutterTts();
   String mode;
   bool paused = true;
+  int gap = -1;
 
   TtsState ttsState = TtsState.stopped;
   List cheatData;
@@ -106,15 +108,15 @@ class _MyHomePageState extends State<MyHomePage> {
         cheatData.remove(x);
       } else {
         // print("o here");
-        x = 1 + rng.nextInt(100);
+        x = 1 + rng.nextInt(90);
       }
     } catch (e) {
-      x = 1 + rng.nextInt(100);
+      x = 1 + rng.nextInt(90);
     }
     print(x);
     if (mp[x] == 0) {
       _speak(x);
-      rng.nextInt(100);
+      rng.nextInt(90);
       mp[x] = 1;
       setState(() {
         mp[x] = 1;
@@ -177,7 +179,8 @@ class _MyHomePageState extends State<MyHomePage> {
     } else
       return Container();
   }
- Timer timer;
+
+  Timer timer;
   getModeButton(String mode) {
     print(paused);
     if (mode == "manual") {
@@ -188,26 +191,31 @@ class _MyHomePageState extends State<MyHomePage> {
               style: TextStyle(color: Colors.white, fontSize: 30)));
     } else {
       // paused = true;
+      if (mode == "auto1") {
+        gap = 4;
+      } else if (mode == "auto2") {
+        gap = 6;
+      } else {
+        gap = 10;
+      }
 
       return FlatButton(
           autofocus: true,
           onPressed: () {
             if (paused == true) {
               paused = false;
-              timer = Timer.periodic(Duration(seconds: 5), (timer) {
+              timer = Timer.periodic(Duration(seconds: gap), (timer) {
                 paused = false;
-                if (paused == false)
-                  random_number();
+                if (paused == false) random_number();
               });
             } else {
               timer.cancel();
               setState(() {
- paused = true;
+                paused = true;
               });
-
             }
           },
-          child: (paused==false)
+          child: (paused == false)
               ? Icon(Icons.pause, color: Colors.white, size: 50)
               : Icon(Icons.play_arrow, color: Colors.white, size: 50));
     }
