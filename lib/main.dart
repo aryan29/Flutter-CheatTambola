@@ -1,7 +1,7 @@
 import 'dart:collection';
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:tambola/settingPage.dart';
+import 'settingPage.dart';
 import 'src/empty_page.dart';
 import 'dart:math';
 import 'package:passcode_screen/passcode_screen.dart';
