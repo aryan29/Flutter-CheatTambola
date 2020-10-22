@@ -17,9 +17,9 @@ A tambola game made in Flutter where you can fix some numbers so that you can wi
 |------|-------|
 |<img src="img/5.jpeg" width="400"/>|<img src="img/6.jpeg" width="400"/>|
 
-| 5 | 6 |
+| 5 |6|
 |------|-------|
-|<img src="img/3.jpeg" width="400"/>|<img src="img/7.jpeg" width="400"/>|    
+|<img src="img/7.jpeg" width="400"/>||
 
 # Download
 The app is avilable on Play Store
