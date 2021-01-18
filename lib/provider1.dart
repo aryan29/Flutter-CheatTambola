@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 class Modes with ChangeNotifier {
-  String _mode = "manual";
+  static String _mode = "manual";
   String get mode => _mode;
 
   void notifyRebuild(String mode) {
-    print("Going to Notify THem");
+    print("Notfying rebuild");
     _mode = mode;
-    notifyListeners();
+    notifyListeners(); //Notify consumers to rebuild themselves
   }
 }

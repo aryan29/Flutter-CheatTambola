@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:tambola/first.dart';
 import 'settingPage.dart';
 import 'src/empty_page.dart';
 import 'dart:math';
@@ -9,13 +10,17 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 import 'provider1.dart';
+import 'package:page_transition/page_transition.dart';
 
+int initScreen = 0;
 enum TtsState { playing, stopped }
 
 SharedPreferences pref;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   pref = await SharedPreferences.getInstance();
+  initScreen = pref.getInt("initScreen");
+  pref.setInt("initScreen", 1);
   runApp(ChangeNotifierProvider(
       create: (_) => Modes(), child: MaterialApp(home: new MyApp())));
 }
@@ -23,13 +28,15 @@ void main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    print("Building page again");
     return MaterialApp(
-      title: 'Tambola Game',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(title: 'Tambola Game'),
-    );
+        title: 'Tambola Game',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home: (initScreen == 0 || initScreen == null)
+            ? FirstScreen()
+            : MyHomePage(title: 'Tambola Game'));
   }
 }
 
@@ -50,6 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
   TtsState ttsState = TtsState.stopped;
   List cheatData;
   _MyHomePageState({this.cheatData});
+  // ignore: close_sinks
   final StreamController<bool> _verificationNotifier =
       StreamController<bool>.broadcast();
   String cur = "";
@@ -88,6 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ));
   }
 
+  // ignore: missing_return
   Future<void> _onPasscodeEntered(String enteredPasscode) {
     bool isValid;
     if (!pref.containsKey("password"))
@@ -133,10 +142,13 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void init() {
-    paused = true;
+    if (timer != null) timer.cancel();
     print(cheatData);
     print("Coming to init");
-    cheatData = [];
+    setState(() {
+      paused = true;
+      cheatData = [];
+    });
     //print(cheatData);
     for (int i = 1; i <= 100; i++) {
       mp[i] = 0;
@@ -186,7 +198,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Timer timer;
   getModeButton(String mode) {
-    print(paused);
     if (mode == "manual") {
       return FlatButton(
           autofocus: true,
@@ -196,20 +207,18 @@ class _MyHomePageState extends State<MyHomePage> {
     } else {
       // paused = true;
       if (mode == "auto1") {
-        gap = 4;
+        gap = 3;
       } else if (mode == "auto2") {
         gap = 6;
       } else {
         gap = 10;
       }
-
       return FlatButton(
           autofocus: true,
           onPressed: () {
             if (paused == true) {
-              paused = false;
+              setState(() => paused = false);
               timer = Timer.periodic(Duration(seconds: gap), (timer) {
-                paused = false;
                 if (paused == false) random_number();
               });
             } else {
@@ -232,14 +241,21 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       // floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
       floatingActionButton: Align(
-        alignment: Alignment(0.9, 0.2),
+        alignment: Alignment(0.9, -0.9),
         child: GestureDetector(
           onLongPress: () {
             return _showLockScreen(context, opaque: false);
           },
           onTap: () {
-            Navigator.of(context)
-                .push(MaterialPageRoute(builder: (context) => Settings()));
+            Navigator.push(
+                context,
+                PageTransition(
+                    child: Settings(),
+                    duration: Duration(milliseconds: 500),
+                    reverseDuration: Duration(milliseconds: 500),
+                    type: PageTransitionType.bottomToTop));
+            // Navigator.of(context)
+            //     .push(MaterialPageRoute(builder: (context) => Settings()));
           },
           child: Icon(Icons.settings, size: 40, color: Colors.white),
         ),
@@ -257,7 +273,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Text(
                     cur,
                     style: TextStyle(
-                      fontSize: 50.0,
+                      fontSize: 45.0,
                       fontFamily: "Horizon",
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -286,11 +302,13 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   )),
               SizedBox(height: 20),
-              Consumer<Modes>(
-                builder: (context, myModel, child) {
-                  print("Hey I am getting Notified");
-                  return getModeButton(myModel.mode);
-                },
+              Container(
+                child: Consumer<Modes>(
+                  builder: (context, myModel, child) {
+                    print("Hey I am getting Notified");
+                    return getModeButton(myModel.mode);
+                  },
+                ),
               ),
               SizedBox(height: 40),
               Align(

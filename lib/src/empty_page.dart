@@ -35,36 +35,39 @@ class EmptyPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return new Scaffold(
       body: SingleChildScrollView(
-              child: Center(
+        child: Center(
             child: Column(
           children: <Widget>[
             SizedBox(
-              height: 200,
+              height: 100,
             ),
-            Container(
-              width: 300,
-              child: TextField(
-                  controller: mycontroller,
-                  style: TextStyle(letterSpacing: 4.0),
-                  keyboardType: TextInputType.multiline,
-                  maxLines: null,
-                  decoration: InputDecoration(
-                    icon: Icon(Icons.confirmation_number),
-                    hintText: "Ex:- 1,2,3",
-                  )),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            FlatButton(
-                color: Colors.blue,
-                onPressed: () async {
-                  await setli();
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) =>
-                          MyHomePage(title: "Tambola", cheatData: li)));
-                },
-                child: Text("Save")),
+            Column(children: [
+              Container(child: Text("Enter numbers in your ticket here")),
+              Container(
+                width: 300,
+                child: TextField(
+                    controller: mycontroller,
+                    style: TextStyle(letterSpacing: 4.0),
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                    decoration: InputDecoration(
+                      icon: Icon(Icons.confirmation_number),
+                      hintText: "Ex:- 1,2,3",
+                    )),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              FlatButton(
+                  color: Colors.blue,
+                  onPressed: () async {
+                    await setli();
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) =>
+                            MyHomePage(title: "Tambola", cheatData: li)));
+                  },
+                  child: Text("Save")),
+            ]),
             SizedBox(
               height: 20,
             ),
@@ -82,28 +85,31 @@ class EmptyPage extends StatelessWidget {
             SizedBox(
               height: 100,
             ),
-            Container(
-              width: 300,
-              child: TextField(
-                  controller: mycontroller1,
-                  style: TextStyle(letterSpacing: 4.0),
-                  keyboardType: TextInputType.number,
-                  maxLines: null,
-                  decoration: InputDecoration(
-                    icon: Icon(Icons.confirmation_number),
-                    hintText: "Ex:- Enter 6 Digit Numerical Password",
-                  )),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            FlatButton(
-                color: Colors.blue,
-                onPressed: () async {
-                  if(mycontroller1.text.length==6)
-                  pref.setString("password", mycontroller1.text);
-                },
-                child: Text("Save")),
+            Column(children: [
+              Container(child: Text("Enter your new password here")),
+              Container(
+                width: 300,
+                child: TextField(
+                    controller: mycontroller1,
+                    style: TextStyle(letterSpacing: 4.0),
+                    keyboardType: TextInputType.number,
+                    maxLines: null,
+                    decoration: InputDecoration(
+                      icon: Icon(Icons.confirmation_number),
+                      hintText: "Ex:- 123456",
+                    )),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              FlatButton(
+                  color: Colors.blue,
+                  onPressed: () async {
+                    if (mycontroller1.text.length == 6)
+                      pref.setString("password", mycontroller1.text);
+                  },
+                  child: Text("Save")),
+            ])
           ],
         )),
       ),
