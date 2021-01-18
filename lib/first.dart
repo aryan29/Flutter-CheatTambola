@@ -28,7 +28,7 @@ class FirstScreen extends StatelessWidget {
                             context,
                             PageTransition(
                                 duration: Duration(milliseconds: 500),
-                                type: PageTransitionType.leftToRight,
+                                type: PageTransitionType.rightToLeft,
                                 child: MyHomePage(title: "Tambola Game")));
                       },
                       label: Text("Next")),

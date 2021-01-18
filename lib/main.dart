@@ -273,7 +273,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Text(
                     cur,
                     style: TextStyle(
-                      fontSize: 50.0,
+                      fontSize: 45.0,
                       fontFamily: "Horizon",
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
